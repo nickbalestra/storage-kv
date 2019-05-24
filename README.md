@@ -1,6 +1,11 @@
 # storage-kv
 
-NodeJS library for [Cloudflare's Workers KV](https://blog.cloudflare.com/workers-kv-is-ga/) inspired by the [std:kv-storage](https://wicg.github.io/kv-storage/#storagearea) specs.
+Node.js client for Cloudflare's KV Storage: a global, highly distributed, low-latency, key-value data store. 
+
+Workers KV is a highly distributed, eventually consistent, key-value store that spans Cloudflare's global edge. It allows you to store billions of key-value pairs and read them with ultra-low latency anywhere in the world. Now you can build entire applications with the performance of a CDN static cache.
+
+
+This project follows the [std:kv-storage](https://wicg.github.io/kv-storage/#storagearea) specs.
 
 ⚠️ Early preview release (0.0.4) - Don't use in production.
 
