@@ -91,8 +91,8 @@ for await (const key of storage.keys()) {
   console.log(key);
 }
 
-"one-cat"
-"another-cat"
+// "one-cat"
+// "another-cat"
 ```
 
 ### Retrieving all values
@@ -104,8 +104,8 @@ for await (const value of storage.values()) {
   console.log(value);
 }
 
-"birman"
-"american curl"
+// "birman"
+// "american curl"
 ```
 
 ### Retrieving all entries
@@ -117,6 +117,6 @@ for await (const [key, value] of storage.entries()) {
   console.log(key, value);
 }
 
-"one-cat", "birman"
-"another-cat", "american curl"
+// "one-cat", "birman"
+// "another-cat", "american curl"
 ```
