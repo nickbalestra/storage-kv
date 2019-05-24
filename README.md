@@ -1,1 +1,1 @@
-# kv-storage
+# storage-kv
