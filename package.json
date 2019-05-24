@@ -23,7 +23,7 @@
   },
   "scripts": {
     "eslint": "eslint src",
-    "prettier": "prettier './src/**/*.*'",
+    "prettier": "prettier './**/*.{js,md}'",
     "prettier:fix": "yarn prettier --write",
     "test": "jest"
   }
