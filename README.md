@@ -2,6 +2,8 @@
 
 Same API of [std:kv-storage](https://wicg.github.io/kv-storage/#storagearea) module for [Cloudflare's Workers KV](https://blog.cloudflare.com/workers-kv-is-ga/).
 
+⚠️ Early preview release (0.0.3) - Don't use in production.
+
 ## Usage
 
 ### Install
