@@ -36,17 +36,18 @@ const storage = new StorageArea("cats");
 You can specify in the options the path to Cloudflare credentials file:
 
 ```js
-const storage = new StorageArea("cats", { keyFilename: '/path/to/keyFilename.json' });
+const storage = new StorageArea("cats", {
+  keyFilename: "/path/to/keyFilename.json"
+});
 ```
 
 or passing the credentials directly
 
 ```js
-const storage = new StorageArea("cats", { credentials: {id, email, key }});
+const storage = new StorageArea("cats", { credentials: { id, email, key } });
 ```
 
 > If none is given it will look for credential CF_KEY, CF_ID, CF_EMAIL or KEYFILENAME in global env, falling back to "./credentials.json".
-
 
 ### Storing values
 
@@ -64,7 +65,7 @@ Asynchronously retrieves the value stored at the given key, or undefined if ther
 
 ```js
 const cat = await storage.get("one-cat");
-console.assert(cat === "birman")
+console.assert(cat === "birman");
 ```
 
 ### Deleting single values
