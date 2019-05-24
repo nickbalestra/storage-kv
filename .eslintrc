@@ -1,0 +1,11 @@
+{
+  "extends": "airbnb-base",
+  "rules": {
+    "arrow-parens": "off",
+    "comma-dangle": "off",
+    "generator-star-spacing": "off",
+    "indent": "off",
+    "max-len": "off",
+    "quotes": "off"
+  }
+}
