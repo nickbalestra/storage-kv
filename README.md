@@ -1,6 +1,6 @@
 # storage-kv
 
-Same API of [std:kv-storage](https://wicg.github.io/kv-storage/#storagearea) module for [Cloudflare's Workers KV](https://blog.cloudflare.com/workers-kv-is-ga/).
+NodeJS library for [Cloudflare's Workers KV](https://blog.cloudflare.com/workers-kv-is-ga/) inspired by the [std:kv-storage](https://wicg.github.io/kv-storage/#storagearea) specs.
 
 ⚠️ Early preview release (0.0.3) - Don't use in production.
 
