@@ -8,7 +8,7 @@ module.exports = credentials => {
   if (!credentials) {
     credentials = process.env.KEYFILENAME
       ? require(process.env.KEYFILENAME)
-      : process.env.CF_EMAIL && process.env.CF_ID && process.env.KEY
+      : process.env.CF_EMAIL && process.env.CF_ID && process.env.CF_KEY
       ? {
           id: process.env.CF_ID,
           email: process.env.CF_EMAIL,
