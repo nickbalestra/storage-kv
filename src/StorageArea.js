@@ -141,6 +141,9 @@ class StorageArea {
 
   // Retrieves an async iterator containing the keys of all entries in this storage area.
   async *keys(options = {}) {
+    if (!this.id) {
+      this.id = await initialize(this);
+    }
     const params = options.limit ? `?limit=${options.limit}` : "";
     let url = `/storage/kv/namespaces/${this.id}/keys${params}`;
 
@@ -162,6 +165,9 @@ class StorageArea {
 
   // Asynchronously retrieves an array containing the values of all entries in this storage area.
   async *values(options) {
+    if (!this.id) {
+      this.id = await initialize(this);
+    }
     for await (const key of this.keys(options)) {
       const value = await this.req({
         url: `/storage/kv/namespaces/${this.id}/values/${key}`
@@ -174,6 +180,9 @@ class StorageArea {
   // Asynchronously retrieves an array of two-element [key, value] arrays,
   // each of which corresponds to an entry in this storage area.
   async *entries(options) {
+    if (!this.id) {
+      this.id = await initialize(this);
+    }
     for await (const key of this.keys(options)) {
       const value = await this.req({
         url: `/storage/kv/namespaces/${this.id}/values/${key}`
