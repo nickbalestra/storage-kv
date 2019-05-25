@@ -4,5 +4,5 @@
 TODO
 node_modules
 credentials.json
-/test.js
+/testLocal.js
 *.log
