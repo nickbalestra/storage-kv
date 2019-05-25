@@ -1,13 +1,12 @@
 # storage-kv
 
-Node.js client for Cloudflare's KV Storage: a global, highly distributed, low-latency, key-value data store. 
+Node.js client for Cloudflare's KV Storage: a global, highly distributed, low-latency, key-value data store.
 
 Workers KV is a highly distributed, eventually consistent, key-value store that spans Cloudflare's global edge. It allows you to store billions of key-value pairs and read them with ultra-low latency anywhere in the world. Now you can build entire applications with the performance of a CDN static cache.
 
-
 This project follows the [std:kv-storage](https://wicg.github.io/kv-storage/#storagearea) specs.
 
-⚠️ Early preview release (0.0.4) - Don't use in production.
+⚠️ Early preview release (0.0.5) - Don't use in production.
 
 ## Usage
 
@@ -91,6 +90,7 @@ await storage.clear();
 ### Retrieving all keys
 
 Retrieves an async iterator containing the keys of all entries in this storage area.
+Keys will be yielded in ascending order;
 
 ```js
 for await (const key of storage.keys()) {
@@ -103,7 +103,8 @@ for await (const key of storage.keys()) {
 
 ### Retrieving all values
 
-Asynchronously retrieves an array containing the values of all entries in this storage area.
+Retrieves an async iterator containing the values of all entries in this storage area.
+Values will be ordered as corresponding to their keys; see `keys()`.
 
 ```js
 for await (const value of storage.values()) {
@@ -116,7 +117,8 @@ for await (const value of storage.values()) {
 
 ### Retrieving all entries
 
-Asynchronously retrieves an array of two-element `[key, value]` arrays, each of which corresponds to an entry in this storage area.
+Retrieves an async iterator containing the `[keys, values]` of all entries in this storage area.
+Entries will be ordered as corresponding to their keys; see `keys()`.
 
 ```js
 for await (const [key, value] of storage.entries()) {

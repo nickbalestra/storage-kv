@@ -76,7 +76,7 @@ class StorageArea {
       throw new Error(res.data.errors[0].message);
     }
 
-    return;
+    return undefined;
   }
 
   // Asynchronously retrieves the value stored at the given key, or undefined if there is no value stored at key.
@@ -86,7 +86,7 @@ class StorageArea {
       this.id = await initialize(this);
     }
 
-    let { data } = await this.req({
+    const { data } = await this.req({
       url: `/storage/kv/namespaces/${this.id}/values/${key}`
     });
 
@@ -140,6 +140,7 @@ class StorageArea {
   }
 
   // Retrieves an async iterator containing the keys of all entries in this storage area.
+  // Keys will be yielded in ascending order;
   async *keys(options = {}) {
     if (!this.id) {
       this.id = await initialize(this);
@@ -148,6 +149,33 @@ class StorageArea {
     let url = `/storage/kv/namespaces/${this.id}/keys${params}`;
 
     while (url) {
+      const { data } = await this.req({ url }); // eslint-disable-line no-await-in-loop
+      if (data.success && data.result_info.cursor) {
+        const cursor = params
+          ? `&cursor=${data.result_info.cursor}`
+          : `?cursor=${data.result_info.cursor}`;
+        url = `/storage/kv/namespaces/${this.id}/keys${params}${cursor}`;
+      } else {
+        url = null;
+      }
+      // eslint-disable-next-line no-restricted-syntax
+      for (const keyName of data.result.map(key => key.name)) {
+        yield keyName;
+      }
+    }
+  }
+
+  // Retrieves an async iterator containing the values of all entries in this storage area.
+  // Values will be ordered as corresponding to their keys; see keys().
+  async *values(options = {}) {
+    if (!this.id) {
+      this.id = await initialize(this);
+    }
+    const params = options.limit ? `?limit=${options.limit}` : "";
+    let url = `/storage/kv/namespaces/${this.id}/keys${params}`;
+
+    /* eslint-disable no-await-in-loop */
+    while (url) {
       const { data } = await this.req({ url });
       if (data.success && data.result_info.cursor) {
         const cursor = params
@@ -155,41 +183,61 @@ class StorageArea {
           : `?cursor=${data.result_info.cursor}`;
         url = `/storage/kv/namespaces/${this.id}/keys${params}${cursor}`;
       } else {
-        url = "";
+        url = null;
       }
-      for (const key of data.result.map(key => key.name)) {
-        yield key;
+
+      const values = await Promise.all(
+        data.result.map(key =>
+          this.req({
+            url: `/storage/kv/namespaces/${this.id}/values/${key.name}`
+          })
+        )
+      );
+      // eslint-disable-next-line no-restricted-syntax
+      for (const value of values.map(res => res.data)) {
+        yield value;
       }
     }
+    /* eslint-enable no-await-in-loop */
   }
 
-  // Asynchronously retrieves an array containing the values of all entries in this storage area.
-  async *values(options) {
+  // Retrieves an async iterator containing the [keys, values] of all entries in this storage area.
+  // Entries will be ordered as corresponding to their keys; see keys().
+  async *entries(options = {}) {
     if (!this.id) {
       this.id = await initialize(this);
     }
-    for await (const key of this.keys(options)) {
-      const value = await this.req({
-        url: `/storage/kv/namespaces/${this.id}/values/${key}`
-      });
+    const params = options.limit ? `?limit=${options.limit}` : "";
+    let url = `/storage/kv/namespaces/${this.id}/keys${params}`;
 
-      yield value.data;
-    }
-  }
+    /* eslint-disable no-await-in-loop */
+    while (url) {
+      const { data } = await this.req({ url });
+      if (data.success && data.result_info.cursor) {
+        const cursor = params
+          ? `&cursor=${data.result_info.cursor}`
+          : `?cursor=${data.result_info.cursor}`;
+        url = `/storage/kv/namespaces/${this.id}/keys${params}${cursor}`;
+      } else {
+        url = null;
+      }
 
-  // Asynchronously retrieves an array of two-element [key, value] arrays,
-  // each of which corresponds to an entry in this storage area.
-  async *entries(options) {
-    if (!this.id) {
-      this.id = await initialize(this);
+      const values = await Promise.all(
+        data.result.map(key =>
+          this.req({
+            url: `/storage/kv/namespaces/${this.id}/values/${key.name}`
+          })
+        )
+      );
+      // eslint-disable-next-line no-restricted-syntax
+      for (const tuple of values.map((res, i) => [
+        data.result[i].name,
+        res.data
+      ])) {
+        yield tuple;
+      }
     }
-    for await (const key of this.keys(options)) {
-      const value = await this.req({
-        url: `/storage/kv/namespaces/${this.id}/values/${key}`
-      });
-
-      yield [key, value.data];
-    }
+    /* eslint-enable no-await-in-loop */
   }
 }
 

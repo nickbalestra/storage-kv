@@ -1,6 +1,6 @@
 {
   "name": "storage-kv",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "repository": "git@github.com:nickbalestra/kv-storage.git",
   "author": "Nick Balestra <nick@balestra.ch>",
   "license": "MIT",

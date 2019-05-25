@@ -1,5 +1,6 @@
-const { CF_API_URL, CREDENTIALS_FILENAME } = require("./../constants.js");
+/* eslint-disable global-require, no-param-reassign, import/no-dynamic-require, no-nested-ternary */
 const { join } = require("path");
+const { CF_API_URL, CREDENTIALS_FILENAME } = require("./../constants.js");
 
 module.exports = credentials => {
   if (typeof credentials === "string") {
