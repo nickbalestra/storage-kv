@@ -4,14 +4,14 @@ const { join } = require("path");
 const getOptions = require("../src/utils/getOptions");
 const constants = require("../src/constants");
 
-beforeEach(() => {
+afterEach(() => {
   delete process.env.KEYFILENAME;
   delete process.env.CF_ID;
   delete process.env.CF_EMAIL;
   delete process.env.CF_KEY;
 });
 
-test("Passing credential object to getOptions", () => {
+test("Passing credential object", () => {
   const credentials = require(join(__dirname, "mockCredentials.json"));
 
   const options = getOptions(credentials);

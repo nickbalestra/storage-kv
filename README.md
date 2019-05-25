@@ -117,7 +117,7 @@ for await (const value of storage.values()) {
 
 ### Retrieving all entries
 
-Retrieves an async iterator containing the `[keys, values]` of all entries in this storage area.
+Retrieves an async iterator containing the `[key, value]` of all entries in this storage area.
 Entries will be ordered as corresponding to their keys; see `keys()`.
 
 ```js
