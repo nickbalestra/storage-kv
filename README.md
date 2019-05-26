@@ -75,9 +75,8 @@ Keys can be set to be automatically deleted at some time in the future:
 - `ttl`: seconds from now
 
 ```js
-await storage.set("one-cat", "birman", { exp: 1558853089 });
-// or
-await storage.set("one-cat", "birman", { ttl: 60 });
+await storage.set("one-cat", "birman", { ttl: 1558853089 });
+await storage.set("another-cat", "merican curl", { ttl: 60 });
 ```
 
 When storing multiple values options can be specified globally and/or per value
@@ -85,7 +84,7 @@ When storing multiple values options can be specified globally and/or per value
 ```js
 await storage.set(
   [
-    { key: "one-cat", value: "birman", exp: 1558853089 },
+    { key: "one-cat", value: "birman", ttl: 100 },
     { key: "another-cat", value: "american curl" } // ttl 60
   ],
   { ttl: 60 }
