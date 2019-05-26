@@ -6,7 +6,7 @@ Workers KV is a highly distributed, eventually consistent, key-value store that 
 
 This project follows the [std:kv-storage](https://wicg.github.io/kv-storage/#storagearea) specs.
 
-⚠️ Early preview release (0.0.5) - Don't use in production.
+⚠️ Early preview release (0.0.6) - Don't use in production.
 
 ## Usage
 
