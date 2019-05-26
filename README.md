@@ -58,7 +58,7 @@ The returned promise will fulfill with undefined on success.
 await storage.set("one-cat", "birman");
 ```
 
-Can concurrently store multiple values by passing an array
+Can concurrently set multiple values by passing an array
 
 ```js
 await storage.set([
