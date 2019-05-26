@@ -69,7 +69,7 @@ await storage.set([
 
 #### Options
 
-Keys can be set to be automatically deleted at some time in the future:
+Keys can be set to expire:
 
 - `exp`: seconds since epoch
 - `ttl`: seconds from now
