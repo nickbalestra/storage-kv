@@ -1,28 +1,35 @@
+/* eslint-disable no-param-reassign */
+
 const axios = require("axios");
 const getOptions = require("./utils/getOptions.js");
 
-const initialize = async ({ name, req }) => {
+const initialize = async (storage, options = {}) => {
   {
-    const { data } = await req({ url: "/storage/kv/namespaces" });
+    const { data } = await storage.req({ url: "/storage/kv/namespaces" });
     if (data.success && data.result && data.result.length) {
-      const namespace = data.result.find(ns => ns.title === name);
+      const namespace = data.result.find(ns => ns.title === storage.name);
       if (namespace) {
-        return namespace.id;
+        storage.id = namespace.id;
+        return;
       }
     }
   }
+  if (options.onlyIfAvail) {
+    return;
+  }
 
-  const { data } = await req({
+  const { data } = await storage.req({
     method: "post",
     url: "/storage/kv/namespaces",
-    data: { title: name }
+    data: { title: storage.name }
   });
 
   if (data.success && data.result) {
-    return data.result.id;
+    storage.id = data.result.id;
+    return;
   }
 
-  throw new Error(data.errors[0].message);
+  throw new Error(JSON.stringify(data.errors));
 };
 
 class StorageArea {
@@ -43,47 +50,59 @@ class StorageArea {
 
   // Asynchronously stores the given value so that it can later be retrieved by the given key.
   // Keys have to be of type string.
-  // TODO: Invalid keys will cause the returned promise to reject with a "DataError" DOMException.
   // Values types are automatically inferred and can be any of [string, ReadableStream, ArrayBuffer, FormData]
   // You can set keys to be automatically deleted at some time in the future, options support:
   // - exp (second since epoch)
   // - ttl (seconds from now)
   // The returned promise will fulfill with undefined on success.
+  // Can set multiple entries by passing an array of [{key, value, ...options}]
+  // TODO: Invalid keys will cause the returned promise to reject with a "DataError" DOMException.
+  // TODO: Replace multiple entry insertions with bulk endpoint API once available
   async set(key, value, options = {}) {
-    if (value === undefined) {
-      return this.delete(key);
-    }
-    if (!this.id) {
-      this.id = await initialize(this);
-    }
-    let params = "";
-    if (options.exp) {
-      params = `?expiration=${options.exp}`;
-    }
-    if (options.ttl) {
-      params = `?expiration_ttl=${options.ttl}`;
+    let entries;
+    if (Array.isArray(key)) {
+      entries = key;
+      options = value;
+    } else {
+      entries = [{ key, value, ...options }];
     }
 
-    const res = await this.req({
-      method: "put",
-      url: `/storage/kv/namespaces/${this.id}/values/${key}${params}`,
-      data: value
+    if (!this.id) {
+      await initialize(this);
+    }
+
+    entries = entries.map(entry => {
+      let params = "";
+      if (entry.exp || options.exp) {
+        params = `?expiration=${entry.exp || options.exp}`;
+      }
+      if (entry.ttl || options.ttl) {
+        params = `?expiration_ttl=${entry.ttl || options.ttl}`;
+      }
+      const method = entry.value === undefined ? "delete" : "put";
+
+      return this.req({
+        method,
+        url: `/storage/kv/namespaces/${this.id}/values/${entry.key}${params}`,
+        data: entry.value
+      });
     });
 
-    // console.log(res.headers);
+    const responses = await Promise.all(entries);
+    const errors = responses
+      .filter(res => !res.data.success)
+      .map(res => res.errors);
 
-    if (!res.data.success) {
-      throw new Error(res.data.errors[0].message);
+    if (errors.length) {
+      throw new Error(JSON.stringify(errors));
     }
-
-    return undefined;
   }
 
   // Asynchronously retrieves the value stored at the given key, or undefined if there is no value stored at key.
   // Values retrieved will be deserialized from their original form.
   async get(key) {
     if (!this.id) {
-      this.id = await initialize(this);
+      await initialize(this);
     }
 
     const { data } = await this.req({
@@ -102,7 +121,7 @@ class StorageArea {
   // The returned promise will fulfill with undefined on success.
   async delete(key) {
     if (!this.id) {
-      this.id = await initialize(this);
+      await initialize(this);
     }
 
     const { data } = await this.req({
@@ -122,7 +141,10 @@ class StorageArea {
   // The returned promise will fulfill with undefined on success.
   async clear() {
     if (!this.id) {
-      return;
+      await initialize(this, { onlyIfAvail: true });
+      if (!this.id) {
+        return;
+      }
     }
     // delete current namespace
     // set id to null for lazy initialization on next operation
@@ -143,7 +165,7 @@ class StorageArea {
   // Keys will be yielded in ascending order;
   async *keys(options = {}) {
     if (!this.id) {
-      this.id = await initialize(this);
+      await initialize(this);
     }
     const params = options.limit ? `?limit=${options.limit}` : "";
     let url = `/storage/kv/namespaces/${this.id}/keys${params}`;
@@ -169,7 +191,7 @@ class StorageArea {
   // Values will be ordered as corresponding to their keys; see keys().
   async *values(options = {}) {
     if (!this.id) {
-      this.id = await initialize(this);
+      await initialize(this);
     }
     const params = options.limit ? `?limit=${options.limit}` : "";
     let url = `/storage/kv/namespaces/${this.id}/keys${params}`;
@@ -205,7 +227,7 @@ class StorageArea {
   // Entries will be ordered as corresponding to their keys; see keys().
   async *entries(options = {}) {
     if (!this.id) {
-      this.id = await initialize(this);
+      await initialize(this);
     }
     const params = options.limit ? `?limit=${options.limit}` : "";
     let url = `/storage/kv/namespaces/${this.id}/keys${params}`;

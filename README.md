@@ -51,11 +51,45 @@ const storage = new StorageArea("cats", { credentials: { id, email, key } });
 ### Storing values
 
 Asynchronously stores the given value so that it can later be retrieved by the given key.
+Values types are automatically inferred and can be any of [String, ReadableStream, ArrayBuffer, FormData]
 The returned promise will fulfill with undefined on success.
 
 ```js
 await storage.set("one-cat", "birman");
-await storage.set("another-cat", "american curl");
+```
+
+Can concurrently store multiple values by passing an array
+
+```js
+await storage.set([
+  { key: "one-cat", value: "birman" },
+  { key: "another-cat", value: "american curl" }
+]);
+```
+
+#### Options
+
+Keys can be set to be automatically deleted at some time in the future:
+
+- `exp`: seconds since epoch
+- `ttl`: seconds from now
+
+```js
+await storage.set("one-cat", "birman", { exp: 1558853089 });
+// or
+await storage.set("one-cat", "birman", { ttl: 60 });
+```
+
+When storing multiple values options can be specified globally and/or per value
+
+```js
+await storage.set(
+  [
+    { key: "one-cat", value: "birman", exp: 1558853089 },
+    { key: "another-cat", value: "american curl" } // ttl 60
+  ],
+  { ttl: 60 }
+);
 ```
 
 ### Retrieving values
