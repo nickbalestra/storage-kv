@@ -4,5 +4,6 @@
 TODO
 node_modules
 credentials.json
+cf-credentials.json
 /testLocal.js
 *.log
