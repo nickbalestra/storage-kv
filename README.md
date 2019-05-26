@@ -75,7 +75,7 @@ Keys can be set to be automatically deleted at some time in the future:
 - `ttl`: seconds from now
 
 ```js
-await storage.set("one-cat", "birman", { ttl: 1558853089 });
+await storage.set("one-cat", "birman", { exp: 1558853089 });
 await storage.set("another-cat", "merican curl", { ttl: 60 });
 ```
 
