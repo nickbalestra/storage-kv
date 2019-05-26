@@ -51,7 +51,7 @@ const storage = new StorageArea("cats", { credentials: { id, email, key } });
 ### Storing values
 
 Asynchronously stores the given value so that it can later be retrieved by the given key.
-Values types are automatically inferred and can be any of [String, ReadableStream, ArrayBuffer, FormData]
+Values types are automatically inferred and can be of type [`String`, `ReadableStream`, `ArrayBuffer`, `FormData`].
 The returned promise will fulfill with undefined on success.
 
 ```js
