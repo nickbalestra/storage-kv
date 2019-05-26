@@ -46,7 +46,7 @@ or passing the credentials directly
 const storage = new StorageArea("cats", { credentials: { id, email, key } });
 ```
 
-> If none is given it will look for credential CF_KEY, CF_ID, CF_EMAIL or KEYFILENAME in global env, falling back to "./credentials.json".
+> If none is given it will look for credential CF_KEY, CF_ID, CF_EMAIL or CF_KEYFILENAME in global env, falling back to "./cf-credentials.json".
 
 ### Storing values
 
