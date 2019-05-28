@@ -55,46 +55,32 @@ class StorageArea {
   // - exp (second since epoch)
   // - ttl (seconds from now)
   // The returned promise will fulfill with undefined on success.
-  // Can set multiple entries by passing an array of [{key, value, ...options}]
   // TODO: Invalid keys will cause the returned promise to reject with a "DataError" DOMException.
-  // TODO: Replace multiple entry insertions with bulk endpoint API once available
   async set(key, value, options = {}) {
-    let entries;
-    if (Array.isArray(key)) {
-      entries = key;
-      options = value;
-    } else {
-      entries = [{ key, value, ...options }];
+    if (value === undefined) {
+      return this.delete(key);
     }
 
     if (!this.id) {
       await initialize(this);
     }
 
-    entries = entries.map(entry => {
-      let params = "";
-      if (entry.exp || options.exp) {
-        params = `?expiration=${entry.exp || options.exp}`;
-      }
-      if (entry.ttl || options.ttl) {
-        params = `?expiration_ttl=${entry.ttl || options.ttl}`;
-      }
-      const method = entry.value === undefined ? "delete" : "put";
+    let params = "";
+    if (options.exp) {
+      params = `?expiration=${options.exp}`;
+    }
+    if (options.ttl) {
+      params = `?expiration_ttl=${options.ttl}`;
+    }
 
-      return this.req({
-        method,
-        url: `/storage/kv/namespaces/${this.id}/values/${entry.key}${params}`,
-        data: entry.value
-      });
+    const res = await this.req({
+      method: "put",
+      url: `/storage/kv/namespaces/${this.id}/values/${key}${params}`,
+      data: value
     });
 
-    const responses = await Promise.all(entries);
-    const errors = responses
-      .filter(res => !res.data.success)
-      .map(res => res.errors);
-
-    if (errors.length) {
-      throw new Error(JSON.stringify(errors));
+    if (!res.data.success && res.data.errors.length) {
+      throw new Error(JSON.stringify(res.data.errors));
     }
   }
 
