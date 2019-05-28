@@ -51,7 +51,7 @@ const storage = new StorageArea("cats", { credentials: { id, email, key } });
 ### Storing values
 
 Asynchronously stores the given value so that it can later be retrieved by the given key.
-Values types are automatically inferred and can be any of [String, ReadableStream, ArrayBuffer, FormData]
+Values types are automatically inferred and can be of type [`String`, `ReadableStream`, `ArrayBuffer`, `FormData`].
 The returned promise will fulfill with undefined on success.
 
 ```js
@@ -60,13 +60,13 @@ await storage.set("one-cat", "birman");
 
 #### Options
 
-Keys can be set to be automatically deleted at some time in the future:
+Keys can be set to expire:
 
 - `exp`: seconds since epoch
 - `ttl`: seconds from now
 
 ```js
-await storage.set("one-cat", "birman", { ttl: 1558853089 });
+await storage.set("one-cat", "birman", { exp: 1558853089 });
 await storage.set("another-cat", "merican curl", { ttl: 60 });
 ```
 
