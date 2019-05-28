@@ -5,7 +5,7 @@ const getOptions = require("./utils/getOptions.js");
 
 const initialize = async (storage, options = {}) => {
   {
-    const { data } = await storage.req({ url: "/storage/kv/namespaces" });
+    const { data } = await storage.api.get("/storage/kv/namespaces");
     if (data.success && data.result && data.result.length) {
       const namespace = data.result.find(ns => ns.title === storage.name);
       if (namespace) {
@@ -18,10 +18,8 @@ const initialize = async (storage, options = {}) => {
     return;
   }
 
-  const { data } = await storage.req({
-    method: "post",
-    url: "/storage/kv/namespaces",
-    data: { title: storage.name }
+  const { data } = await storage.api.post("/storage/kv/namespaces", {
+    title: storage.name
   });
 
   if (data.success && data.result) {
@@ -38,7 +36,7 @@ class StorageArea {
     // credentials: require('/path/to/keyFilename.json')
     // if both are undefined it will look for credential [CF_KEY, CF_ID, CF_EMAIL] or KEYFILENAME on global envs
     // otherwise default to cwd/credentials.json
-    this.req = axios.create(
+    this.api = axios.create(
       getOptions(options.keyFilename || options.credentials)
     );
 
@@ -73,11 +71,10 @@ class StorageArea {
       params = `?expiration_ttl=${options.ttl}`;
     }
 
-    const res = await this.req({
-      method: "put",
-      url: `/storage/kv/namespaces/${this.id}/values/${key}${params}`,
-      data: value
-    });
+    const res = await this.api.put(
+      `/storage/kv/namespaces/${this.id}/values/${key}${params}`,
+      value
+    );
 
     if (!res.data.success && res.data.errors.length) {
       throw new Error(JSON.stringify(res.data.errors));
@@ -91,9 +88,9 @@ class StorageArea {
       await initialize(this);
     }
 
-    const { data } = await this.req({
-      url: `/storage/kv/namespaces/${this.id}/values/${key}`
-    });
+    const { data } = await this.api.get(
+      `/storage/kv/namespaces/${this.id}/values/${key}`
+    );
 
     if (!data.errors) {
       return data;
@@ -110,10 +107,9 @@ class StorageArea {
       await initialize(this);
     }
 
-    const { data } = await this.req({
-      method: "delete",
-      url: `/storage/kv/namespaces/${this.id}/values/${key}`
-    });
+    const { data } = await this.api.delete(
+      `/storage/kv/namespaces/${this.id}/values/${key}`
+    );
 
     if (data.success) {
       return;
@@ -134,10 +130,7 @@ class StorageArea {
     }
     // delete current namespace
     // set id to null for lazy initialization on next operation
-    const { data } = await this.req({
-      method: "delete",
-      url: `/storage/kv/namespaces/${this.id}`
-    });
+    const { data } = await this.api.delete(`/storage/kv/namespaces/${this.id}`);
 
     if (data.success) {
       this.id = null;
@@ -157,7 +150,7 @@ class StorageArea {
     let url = `/storage/kv/namespaces/${this.id}/keys${params}`;
 
     while (url) {
-      const { data } = await this.req({ url }); // eslint-disable-line no-await-in-loop
+      const { data } = await this.api.get(url); // eslint-disable-line no-await-in-loop
       if (data.success && data.result_info.cursor) {
         const cursor = params
           ? `&cursor=${data.result_info.cursor}`
@@ -184,7 +177,7 @@ class StorageArea {
 
     /* eslint-disable no-await-in-loop */
     while (url) {
-      const { data } = await this.req({ url });
+      const { data } = await this.api.get(url);
       if (data.success && data.result_info.cursor) {
         const cursor = params
           ? `&cursor=${data.result_info.cursor}`
@@ -196,9 +189,7 @@ class StorageArea {
 
       const values = await Promise.all(
         data.result.map(key =>
-          this.req({
-            url: `/storage/kv/namespaces/${this.id}/values/${key.name}`
-          })
+          this.api.get(`/storage/kv/namespaces/${this.id}/values/${key.name}`)
         )
       );
       // eslint-disable-next-line no-restricted-syntax
@@ -220,7 +211,7 @@ class StorageArea {
 
     /* eslint-disable no-await-in-loop */
     while (url) {
-      const { data } = await this.req({ url });
+      const { data } = await this.api.get(url);
       if (data.success && data.result_info.cursor) {
         const cursor = params
           ? `&cursor=${data.result_info.cursor}`
@@ -232,9 +223,7 @@ class StorageArea {
 
       const values = await Promise.all(
         data.result.map(key =>
-          this.req({
-            url: `/storage/kv/namespaces/${this.id}/values/${key.name}`
-          })
+          this.api.get(`/storage/kv/namespaces/${this.id}/values/${key.name}`)
         )
       );
       // eslint-disable-next-line no-restricted-syntax
