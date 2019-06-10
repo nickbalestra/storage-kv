@@ -58,15 +58,6 @@ The returned promise will fulfill with undefined on success.
 await storage.set("one-cat", "birman");
 ```
 
-Can concurrently set multiple values by passing an array
-
-```js
-await storage.set([
-  { key: "one-cat", value: "birman" },
-  { key: "another-cat", value: "american curl" }
-]);
-```
-
 #### Options
 
 Keys can be set to expire:
@@ -77,18 +68,6 @@ Keys can be set to expire:
 ```js
 await storage.set("one-cat", "birman", { exp: 1558853089 });
 await storage.set("another-cat", "merican curl", { ttl: 60 });
-```
-
-When storing multiple values options can be specified globally and/or per value
-
-```js
-await storage.set(
-  [
-    { key: "one-cat", value: "birman", ttl: 100 },
-    { key: "another-cat", value: "american curl" } // ttl 60
-  ],
-  { ttl: 60 }
-);
 ```
 
 ### Retrieving values
