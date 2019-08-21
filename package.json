@@ -1,6 +1,6 @@
 {
   "name": "storage-kv",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "repository": "git@github.com:nickbalestra/kv-storage.git",
   "author": "Nick Balestra <nick@balestra.ch>",
   "license": "MIT",
@@ -8,9 +8,6 @@
   "files": [
     "src"
   ],
-  "engines": {
-    "node": "10.x"
-  },
   "dependencies": {
     "axios": "^0.19.0"
   },
