@@ -1,7 +1,8 @@
-/* eslint-disable no-param-reassign */
+import { createRequire } from "module";
+import getOptions from "./utils/getOptions.js";
 
+const require = createRequire(import.meta.url);
 const axios = require("axios");
-const getOptions = require("./utils/getOptions.js");
 
 const initialize = async (storage, options = {}) => {
   {
@@ -30,7 +31,7 @@ const initialize = async (storage, options = {}) => {
   throw new Error(JSON.stringify(data.errors));
 };
 
-class StorageArea {
+export class StorageArea {
   constructor(name, options = {}) {
     // keyFilename: '/path/to/keyFilename.json',
     // credentials: require('/path/to/keyFilename.json')
@@ -150,7 +151,7 @@ class StorageArea {
     let url = `/storage/kv/namespaces/${this.id}/keys${params}`;
 
     while (url) {
-      const { data } = await this.api.get(url); // eslint-disable-line no-await-in-loop
+      const { data } = await this.api.get(url);
       if (data.success && data.result_info.cursor) {
         const cursor = params
           ? `&cursor=${data.result_info.cursor}`
@@ -159,7 +160,6 @@ class StorageArea {
       } else {
         url = null;
       }
-      // eslint-disable-next-line no-restricted-syntax
       for (const keyName of data.result.map(key => key.name)) {
         yield keyName;
       }
@@ -175,7 +175,6 @@ class StorageArea {
     const params = options.limit ? `?limit=${options.limit}` : "";
     let url = `/storage/kv/namespaces/${this.id}/keys${params}`;
 
-    /* eslint-disable no-await-in-loop */
     while (url) {
       const { data } = await this.api.get(url);
       if (data.success && data.result_info.cursor) {
@@ -192,12 +191,10 @@ class StorageArea {
           this.api.get(`/storage/kv/namespaces/${this.id}/values/${key.name}`)
         )
       );
-      // eslint-disable-next-line no-restricted-syntax
       for (const value of values.map(res => res.data)) {
         yield value;
       }
     }
-    /* eslint-enable no-await-in-loop */
   }
 
   // Retrieves an async iterator containing the [keys, values] of all entries in this storage area.
@@ -209,7 +206,6 @@ class StorageArea {
     const params = options.limit ? `?limit=${options.limit}` : "";
     let url = `/storage/kv/namespaces/${this.id}/keys${params}`;
 
-    /* eslint-disable no-await-in-loop */
     while (url) {
       const { data } = await this.api.get(url);
       if (data.success && data.result_info.cursor) {
@@ -226,7 +222,6 @@ class StorageArea {
           this.api.get(`/storage/kv/namespaces/${this.id}/values/${key.name}`)
         )
       );
-      // eslint-disable-next-line no-restricted-syntax
       for (const tuple of values.map((res, i) => [
         data.result[i].name,
         res.data
@@ -234,8 +229,5 @@ class StorageArea {
         yield tuple;
       }
     }
-    /* eslint-enable no-await-in-loop */
   }
 }
-
-module.exports = StorageArea;

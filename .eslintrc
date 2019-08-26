@@ -1,13 +1,10 @@
 {
-  "extends": "airbnb-base",
-  "rules": {
-    "implicit-arrow-linebreak": "off",
-    "function-paren-newline": "off",
-    "arrow-parens": "off",
-    "comma-dangle": "off",
-    "generator-star-spacing": "off",
-    "indent": "off",
-    "max-len": "off",
-    "quotes": "off"
-  }
+  "env": {
+    "node": true,
+    "es6": true,
+    "jest/globals": true
+  },
+  "plugins": ["jest"],
+  "parser": "babel-eslint",
+  "extends": ["eslint:recommended", "plugin:jest/all"]
 }

@@ -1,5 +1,1 @@
-const StorageArea = require("./StorageArea.js");
-
-module.exports = {
-  StorageArea
-};
+export { StorageArea } from "./StorageArea.js";

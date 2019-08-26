@@ -5,6 +5,7 @@
   "author": "Nick Balestra <nick@balestra.ch>",
   "license": "MIT",
   "main": "src/main.js",
+  "type": "module",
   "files": [
     "src"
   ],
@@ -12,14 +13,16 @@
     "axios": "^0.19.0"
   },
   "devDependencies": {
-    "eslint": "^6.2.1",
-    "eslint-config-airbnb-base": "^14.0.0",
-    "eslint-plugin-import": "^2.18.2",
+    "@babel/core": "^7.5.5",
+    "@babel/preset-env": "^7.5.5",
+    "babel-eslint": "^10.0.3",
+    "eslint": "^6.2.2",
+    "eslint-plugin-jest": "^22.15.2",
     "jest": "^24.9.0",
     "prettier": "^1.18.2"
   },
   "scripts": {
-    "eslint": "eslint src",
+    "eslint": "eslint .",
     "prettier": "prettier './**/*.{js,md}'",
     "prettier:fix": "yarn prettier --write",
     "test": "jest"
