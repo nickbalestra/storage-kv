@@ -6,7 +6,7 @@ import {
   CF_KEYFILENAME_ENV_NAME,
   CF_KEY_ENV_NAME
 } from "../src/constants";
-import getOptions from "../src/utils/getOptions";
+import createConfig from "../src/cf/createConfig";
 
 const CREDENTIALS_PATH = join(__dirname, "mockCredentials.json");
 const readCredentials = async () => await import(CREDENTIALS_PATH);
@@ -21,22 +21,22 @@ test("passing credential object", async () => {
   expect.assertions(3);
 
   const credentials = await readCredentials();
-  const options = getOptions(credentials);
+  const options = await createConfig({ credentials });
 
   expect(options.baseURL).toBe(`${CF_API_URL}/accounts/${credentials.id}`);
-  expect(options.headers.common["X-Auth-Email"]).toBe(credentials.email);
-  expect(options.headers.common["X-Auth-Key"]).toBe(credentials.key);
+  expect(options.headers["X-Auth-Email"]).toBe(credentials.email);
+  expect(options.headers["X-Auth-Key"]).toBe(credentials.key);
 });
 
 test("passing path to credentialsFile.json", async () => {
   expect.assertions(3);
 
   const credentials = await readCredentials();
-  const options = getOptions(CREDENTIALS_PATH);
+  const options = await createConfig({ keyFilename: CREDENTIALS_PATH });
 
   expect(options.baseURL).toBe(`${CF_API_URL}/accounts/${credentials.id}`);
-  expect(options.headers.common["X-Auth-Email"]).toBe(credentials.email);
-  expect(options.headers.common["X-Auth-Key"]).toBe(credentials.key);
+  expect(options.headers["X-Auth-Email"]).toBe(credentials.email);
+  expect(options.headers["X-Auth-Key"]).toBe(credentials.key);
 });
 
 test("relying on path available in global env", async () => {
@@ -44,15 +44,15 @@ test("relying on path available in global env", async () => {
 
   process.env[CF_KEYFILENAME_ENV_NAME] = CREDENTIALS_PATH;
   const credentials = await readCredentials();
-  const options = getOptions();
+  const options = await createConfig();
 
   expect(options.baseURL).toBe(`${CF_API_URL}/accounts/${credentials.id}`);
-  expect(options.headers.common["X-Auth-Email"]).toBe(credentials.email);
-  expect(options.headers.common["X-Auth-Key"]).toBe(credentials.key);
+  expect(options.headers["X-Auth-Email"]).toBe(credentials.email);
+  expect(options.headers["X-Auth-Key"]).toBe(credentials.key);
   clearProcess();
 });
 
-test("relying on credential available in global env", () => {
+test("relying on credential available in global env", async () => {
   expect.assertions(3);
 
   const CF_ID = "002";
@@ -62,10 +62,10 @@ test("relying on credential available in global env", () => {
   process.env[CF_ID_ENV_NAME] = CF_ID;
   process.env[CF_EMAIL_ENV_NAME] = CF_EMAIL;
   process.env[CF_KEY_ENV_NAME] = CF_KEY;
-  const options = getOptions();
+  const options = await createConfig();
 
   expect(options.baseURL).toBe(`${CF_API_URL}/accounts/${CF_ID}`);
-  expect(options.headers.common["X-Auth-Email"]).toBe(CF_EMAIL);
-  expect(options.headers.common["X-Auth-Key"]).toBe(CF_KEY);
+  expect(options.headers["X-Auth-Email"]).toBe(CF_EMAIL);
+  expect(options.headers["X-Auth-Key"]).toBe(CF_KEY);
   clearProcess();
 });

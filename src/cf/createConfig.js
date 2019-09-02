@@ -6,15 +6,17 @@ import {
   CF_ID_ENV_NAME,
   CF_KEYFILENAME_ENV_NAME,
   CF_KEY_ENV_NAME
-} from "./../constants.js";
+} from "../constants.js";
 
-export default function(credentials) {
-  if (typeof credentials === "string") {
-    credentials = require(credentials);
+export default async function createConfig(configData = {}) {
+  let { keyFilename = null, credentials = null } = configData;
+
+  if (keyFilename && typeof keyFilename === "string") {
+    credentials = await importJSON(keyFilename);
   }
   if (!credentials) {
     credentials = process.env[CF_KEYFILENAME_ENV_NAME]
-      ? require(process.env[CF_KEYFILENAME_ENV_NAME])
+      ? await importJSON(process.env[CF_KEYFILENAME_ENV_NAME])
       : process.env[CF_EMAIL_ENV_NAME] &&
         process.env[CF_ID_ENV_NAME] &&
         process.env[CF_KEY_ENV_NAME]
@@ -23,16 +25,19 @@ export default function(credentials) {
           id: process.env[CF_ID_ENV_NAME],
           key: process.env[CF_KEY_ENV_NAME]
         }
-      : require(join(process.cwd(), CF_CREDENTIALS_FILENAME));
+      : await importJSON(join(process.cwd(), CF_CREDENTIALS_FILENAME));
   }
 
   return {
     baseURL: `${CF_API_URL}/accounts/${credentials.id}`,
     headers: {
-      common: {
-        "X-Auth-Email": credentials.email,
-        "X-Auth-Key": credentials.key
-      }
+      "X-Auth-Email": credentials.email,
+      "X-Auth-Key": credentials.key
     }
   };
+}
+
+async function importJSON(path) {
+  const module = await import(path);
+  return module.default;
 }
