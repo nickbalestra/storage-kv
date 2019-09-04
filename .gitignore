@@ -7,3 +7,4 @@ credentials.json
 cf-credentials.json
 /testLocal.js
 *.log
+coverage
