@@ -1,36 +1,42 @@
 import fetch from "cross-fetch";
 
-export default function API({ headers, baseURL }) {
-  // TODO: Add validation/normalization for urls
-  const createUrl = endpoint => `${baseURL}${endpoint}`;
-  const createHeaders = (overrides = {}) => {
-    return {
+export default class API {
+  constructor({ headers, baseURL }) {
+    // TODO: Add validation/normalization for urls
+    const createUrl = endpoint => `${baseURL}${endpoint}`;
+    const createHeaders = (overrides = {}) => ({
       "Content-Type": "application/json",
       ...headers,
       ...overrides
-    };
-  };
-
-  const fetchCloudflare = (endpoint, options = {}) => {
-    return fetch(createUrl(endpoint), {
-      method: options.method || "get",
-      headers: createHeaders(options.headers || {}),
-      body: options.body
     });
-  };
 
-  return {
-    async get(endpoint, options) {
-      return fetchCloudflare(endpoint, options);
-    },
-    async post(endpoint, body, options) {
-      return fetchCloudflare(endpoint, { body, method: "post", ...options });
-    },
-    async put(endpoint, body, options) {
-      return fetchCloudflare(endpoint, { body, method: "put", ...options });
-    },
-    async delete(endpoint, body, options) {
-      return fetchCloudflare(endpoint, { body, method: "delete", ...options });
-    }
-  };
+    this.#fetchCloudflare = (endpoint, options = {}) =>
+      fetch(createUrl(endpoint), {
+        method: options.method,
+        headers: createHeaders(options.headers),
+        body: options.body
+      });
+  }
+
+  #fetchCloudflare;
+
+  get = async (endpoint, options) =>
+    this.#fetchCloudflare(endpoint, { method: "get", ...options });
+
+  post = async (endpoint, body, options) =>
+    this.#fetchCloudflare(endpoint, {
+      body,
+      method: "post",
+      ...options
+    });
+
+  put = async (endpoint, body, options) =>
+    this.#fetchCloudflare(endpoint, { body, method: "put", ...options });
+
+  delete = async (endpoint, body, options) =>
+    this.#fetchCloudflare(endpoint, {
+      body,
+      method: "delete",
+      ...options
+    });
 }
